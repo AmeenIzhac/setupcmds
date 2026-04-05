@@ -1,1 +1,85 @@
-dw
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup Commands</title>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+    .container {
+      width: 100%;
+      max-width: 800px;
+    }
+    .snippet {
+      background: #1e293b;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    code {
+      font-family: monospace;
+      font-size: 14px;
+      word-break: break-all;
+    }
+    button {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #38bdf8;
+      border: none;
+      color: black;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    button:hover {
+      opacity: 0.85;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div class="snippet">
+      <button onclick="copy(this)">Copy</button>
+      <code>curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"</code>
+    </div>
+
+    <div class="snippet">
+      <button onclick="copy(this)">Copy</button>
+      <code>bash Miniforge3-$(uname)-$(uname -m).sh</code>
+    </div>
+
+    <div class="snippet">
+      <button onclick="copy(this)">Copy</button>
+      <code>curl -fsSL https://claude.ai/install.sh | bash</code>
+    </div>
+
+    <div class="snippet">
+      <button onclick="copy(this)">Copy</button>
+      <code>echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc</code>
+    </div>
+
+  </div>
+
+  <script>
+    function copy(btn) {
+      const code = btn.nextElementSibling.innerText;
+      navigator.clipboard.writeText(code);
+      btn.innerText = "Copied";
+      setTimeout(() => btn.innerText = "Copy", 1500);
+    }
+  </script>
+
+</body>
+</html>
