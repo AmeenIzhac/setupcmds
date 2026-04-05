@@ -4,108 +4,184 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Setup Commands</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
-      font-family: system-ui, sans-serif;
-      background: #f8fafc;
-      color: #0f172a;
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: #ffffff;
+      color: #1a1a2e;
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      margin: 0;
+      padding: 24px;
     }
+
     .container {
       width: 100%;
-      max-width: 800px;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
+
     .snippet {
-      background: #e2e8f0;
-      border-radius: 14px;
-      padding: 20px;
-      margin: 24px 0;
+      background: #f6f7f9;
+      border: 1px solid #e8eaed;
+      border-radius: 12px;
+      padding: 16px 52px 16px 18px;
       cursor: pointer;
       position: relative;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-      transition: transform 0.1s ease, box-shadow 0.1s ease;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
     }
+
     .snippet:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      background: #f0f1f4;
+      border-color: #d0d3da;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
+
+    .snippet:active {
+      background: #eaecf0;
+    }
+
     code {
-      font-family: monospace;
-      font-size: 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: #2d2d3a;
       word-break: break-all;
       display: block;
-      padding-right: 30px;
     }
+
     .copy-btn {
       position: absolute;
       top: 50%;
       right: 14px;
       transform: translateY(-50%);
-      opacity: 0.6;
-      cursor: pointer;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      color: #9ca3af;
+      transition: color 0.15s ease, background 0.15s ease;
+      pointer-events: none;
     }
-    .copy-btn:hover {
+
+    .snippet:hover .copy-btn {
+      color: #6b7280;
+    }
+
+    .copy-btn.copied {
+      color: #22c55e;
+    }
+
+    .tooltip {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a2e;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+
+    .tooltip.show {
       opacity: 1;
     }
   </style>
 </head>
 <body>
   <div class="container">
-
-    <div class="snippet" onclick="copy(this)">
-      <span class="copy-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="9" y="9" width="13" height="13" rx="2"/>
-          <rect x="3" y="3" width="13" height="13" rx="2"/>
+    <div class="snippet" onclick="copySnippet(this)">
+      <div class="copy-btn">
+        <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
         </svg>
-      </span>
+        <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="tooltip">Copied!</span>
+      </div>
       <code>curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"</code>
     </div>
 
-    <div class="snippet" onclick="copy(this)">
-      <span class="copy-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="9" y="9" width="13" height="13" rx="2"/>
-          <rect x="3" y="3" width="13" height="13" rx="2"/>
+    <div class="snippet" onclick="copySnippet(this)">
+      <div class="copy-btn">
+        <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
         </svg>
-      </span>
+        <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="tooltip">Copied!</span>
+      </div>
       <code>bash Miniforge3-$(uname)-$(uname -m).sh</code>
     </div>
 
-    <div class="snippet" onclick="copy(this)">
-      <span class="copy-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="9" y="9" width="13" height="13" rx="2"/>
-          <rect x="3" y="3" width="13" height="13" rx="2"/>
+    <div class="snippet" onclick="copySnippet(this)">
+      <div class="copy-btn">
+        <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
         </svg>
-      </span>
+        <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="tooltip">Copied!</span>
+      </div>
       <code>curl -fsSL https://claude.ai/install.sh | bash</code>
     </div>
 
-    <div class="snippet" onclick="copy(this)">
-      <span class="copy-btn">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="9" y="9" width="13" height="13" rx="2"/>
-          <rect x="3" y="3" width="13" height="13" rx="2"/>
+    <div class="snippet" onclick="copySnippet(this)">
+      <div class="copy-btn">
+        <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
         </svg>
-      </span>
+        <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="tooltip">Copied!</span>
+      </div>
       <code>echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc</code>
     </div>
-
   </div>
 
   <script>
-    function copy(el) {
+    function copySnippet(el) {
       const code = el.querySelector("code").innerText;
       navigator.clipboard.writeText(code);
 
-      const icon = el.querySelector("svg");
-      icon.style.opacity = "0.3";
-      setTimeout(() => icon.style.opacity = "1", 500);
+      const btn = el.querySelector(".copy-btn");
+      const iconCopy = btn.querySelector(".icon-copy");
+      const iconCheck = btn.querySelector(".icon-check");
+      const tooltip = btn.querySelector(".tooltip");
+
+      iconCopy.style.display = "none";
+      iconCheck.style.display = "block";
+      btn.classList.add("copied");
+      tooltip.classList.add("show");
+
+      setTimeout(() => {
+        iconCopy.style.display = "block";
+        iconCheck.style.display = "none";
+        btn.classList.remove("copied");
+        tooltip.classList.remove("show");
+      }, 1500);
     }
   </script>
 </body>
