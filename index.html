@@ -115,7 +115,8 @@
         </svg>
         <span class="tooltip">Copied!</span>
       </div>
-      <code>useradd -m -s /bin/bash dev
+      <code>apt update && apt install -y sudo
+useradd -m -s /bin/bash dev
 echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 chown -R dev:dev /workspace/ 2>/dev/null; chmod -R 777 /workspace
 echo "exec su - dev" >> /root/.bashrc
