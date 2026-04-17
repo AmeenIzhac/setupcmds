@@ -116,36 +116,139 @@
         </svg>
         <span class="tooltip">Copied!</span>
       </div>
-      <code>useradd -m -d /workspace -s /bin/bash dev 2>/dev/null || usermod -d /workspace dev
+      <code>useradd -m -s /bin/bash dev
 echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-mkdir -p /workspace/envs /workspace/pkgs /workspace/pip_cache /workspace/hf_cache /opt/dev-local/bin
-chown -R dev:dev /workspace /opt/dev-local 2>/dev/null
-chmod -R 777 /workspace
+chown -R dev:dev /workspace/ 2>/dev/null; chmod -R 777 /workspace
 echo "exec su - dev" >> /root/.bashrc
-su - dev << 'DEVEOF'
-cd /tmp
-curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
-bash Miniforge3-$(uname)-$(uname -m).sh -b -p /opt/dev-local/miniforge3
-rm Miniforge3-*.sh
-/opt/dev-local/miniforge3/bin/conda init bash
-curl -fsSL https://claude.ai/install.sh | bash
-mv /workspace/.local/bin/claude /opt/dev-local/bin/ 2>/dev/null
-mkdir -p /workspace/.claude
-cat > /workspace/.claude/settings.json << 'CLAUDECFG'
+su - dev</code>
+    </div>
+
+    <div class="snippet" onclick="copySnippet(this)">
+      <div class="copy-btn">
+        <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="tooltip">Copied!</span>
+      </div>
+      <code>curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"</code>
+    </div>
+
+    <div class="snippet" onclick="copySnippet(this)">
+      <div class="copy-btn">
+        <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="tooltip">Copied!</span>
+      </div>
+      <code>bash Miniforge3-$(uname)-$(uname -m).sh -b && \
+  ~/miniforge3/bin/conda init "$(basename "$SHELL")" && \
+  source ~/."$(basename "$SHELL")"rc</code>
+    </div>
+
+    <div class="snippet" onclick="copySnippet(this)">
+      <div class="copy-btn">
+        <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="tooltip">Copied!</span>
+      </div>
+      <code>curl -fsSL https://claude.ai/install.sh | bash</code>
+    </div>
+
+    <div class="snippet" onclick="copySnippet(this)">
+      <div class="copy-btn">
+        <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="tooltip">Copied!</span>
+      </div>
+      <code>mkdir -p ~/.claude
+cat > ~/.claude/settings.json << 'EOF'
 {
-  "permissions": {"defaultMode": "bypassPermissions"},
+  "permissions": {
+    "defaultMode": "bypassPermissions"
+  },
   "skipDangerousModePermissionPrompt": true
 }
-CLAUDECFG
-cat >> /workspace/.bashrc << 'BASHCFG'
-export PATH="/opt/dev-local/bin:$PATH"
-export PIP_CACHE_DIR=/workspace/pip_cache
-export HF_HOME=/workspace/hf_cache
-export TRANSFORMERS_CACHE=/workspace/hf_cache
-export TORCH_HOME=/workspace/torch_cache
-BASHCFG
-/opt/dev-local/miniforge3/bin/conda config --add envs_dirs /workspace/envs
-/opt/dev-local/miniforge3/bin/conda config --add pkgs_dirs /workspace/pkgs
+EOF</code>
+    </div>
+
+    <div class="snippet" onclick="copySnippet(this)">
+      <div class="copy-btn">
+        <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="tooltip">Copied!</span>
+      </div>
+      <code>echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc</code>
+    </div>
+
+    <div class="snippet" onclick="copySnippet(this)">
+      <div class="copy-btn">
+        <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="tooltip">Copied!</span>
+      </div>
+      <code>conda config --add envs_dirs /workspace/envs</code>
+    </div>
+
+    <div class="snippet" onclick="copySnippet(this)" style="background:#1a1a2e; border-color:#1a1a2e;">
+      <div class="copy-btn" style="color:#9ca3af;">
+        <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="tooltip">Copied!</span>
+      </div>
+      <code style="color:#e5e7eb;">useradd -m -s /bin/bash dev
+echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+chown -R dev:dev /workspace/ 2>/dev/null; chmod -R 777 /workspace
+echo "exec su - dev" >> /root/.bashrc
+su - dev << 'DEVEOF'
+curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+bash Miniforge3-$(uname)-$(uname -m).sh -b
+~/miniforge3/bin/conda init bash
+curl -fsSL https://claude.ai/install.sh | bash
+mkdir -p ~/.claude
+cat > ~/.claude/settings.json << 'EOF'
+{
+  "permissions": {
+    "defaultMode": "bypassPermissions"
+  },
+  "skipDangerousModePermissionPrompt": true
+}
+EOF
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+conda config --add envs_dirs /workspace/envs
 DEVEOF
 su - dev</code>
     </div>
