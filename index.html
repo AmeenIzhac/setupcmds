@@ -189,7 +189,8 @@
       <code>useradd -m -s /bin/bash dev
 echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 chown -R dev:dev /workspace/ 2>/dev/null; chmod -R 777 /workspace
-echo "exec su - dev" >> /root/.bashrc</code>
+echo "exec su - dev" >> /root/.bashrc
+su - dev</code>
     </div>
 
     <div class="snippet" onclick="copySnippet(this)" style="background:#1a1a2e; border-color:#1a1a2e;">
@@ -211,7 +212,8 @@ conda config --add envs_dirs /workspace/envs
 useradd -m -s /bin/bash dev
 echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 chown -R dev:dev /workspace/ 2>/dev/null; chmod -R 777 /workspace
-echo "exec su - dev" >> /root/.bashrc</code>
+echo "exec su - dev" >> /root/.bashrc
+su - dev</code>
     </div>
   </div>
 
