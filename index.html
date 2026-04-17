@@ -228,7 +228,7 @@ EOF</code>
         </svg>
         <span class="tooltip">Copied!</span>
       </div>
-      <code style="color:#e5e7eb;">useradd -m -s /bin/bash -d /workspace dev
+      <code style="color:#e5e7eb;">useradd -m -s /bin/bash dev
 echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 chown -R dev:dev /workspace/ 2>/dev/null; chmod -R 777 /workspace
 echo "exec su - dev" >> /root/.bashrc
@@ -248,7 +248,7 @@ cat > ~/.claude/settings.json << 'EOF'
 EOF
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
-~/miniforge3/bin/conda config --add envs_dirs /workspace/envs
+conda config --add envs_dirs /workspace/envs
 DEVEOF
 su - dev</code>
     </div>
