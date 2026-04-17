@@ -248,7 +248,7 @@ cat > ~/.claude/settings.json << 'EOF'
 EOF
 echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 source ~/.bashrc
-conda config --add envs_dirs /workspace/envs
+~/miniforge3/bin/conda config --add envs_dirs /workspace/envs
 DEVEOF
 su - dev</code>
     </div>
