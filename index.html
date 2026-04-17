@@ -116,17 +116,22 @@
         </svg>
         <span class="tooltip">Copied!</span>
       </div>
-      <code>useradd -m -s /bin/bash dev
+      <code>useradd -m -d /workspace -s /bin/bash dev 2>/dev/null || usermod -d /workspace dev
 echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-chown -R dev:dev /workspace/ 2>/dev/null; chmod -R 777 /workspace
+mkdir -p /workspace/envs /workspace/pkgs /workspace/pip_cache /workspace/hf_cache /opt/dev-local
+chown -R dev:dev /workspace /opt/dev-local 2>/dev/null
+chmod -R 777 /workspace
 echo "exec su - dev" >> /root/.bashrc
 su - dev << 'DEVEOF'
+cd /tmp
 curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
-bash Miniforge3-$(uname)-$(uname -m).sh -b
-~/miniforge3/bin/conda init bash
+bash Miniforge3-$(uname)-$(uname -m).sh -b -p /opt/dev-local/miniforge3
+rm Miniforge3-$(uname)-$(uname -m).sh
+/opt/dev-local/miniforge3/bin/conda init bash
+export CLAUDE_INSTALL_DIR=/opt/dev-local
 curl -fsSL https://claude.ai/install.sh | bash
-mkdir -p ~/.claude
-cat > ~/.claude/settings.json << 'EOF'
+mkdir -p /workspace/.claude
+cat > /workspace/.claude/settings.json << 'EOF'
 {
   "permissions": {
     "defaultMode": "bypassPermissions"
@@ -134,9 +139,16 @@ cat > ~/.claude/settings.json << 'EOF'
   "skipDangerousModePermissionPrompt": true
 }
 EOF
-echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
-conda config --add envs_dirs /workspace/envs
+cat >> /workspace/.bashrc << 'EOF'
+export PATH="/opt/dev-local/bin:$PATH"
+export PIP_CACHE_DIR=/workspace/pip_cache
+export HF_HOME=/workspace/hf_cache
+export TRANSFORMERS_CACHE=/workspace/hf_cache
+export TORCH_HOME=/workspace/torch_cache
+EOF
+source /workspace/.bashrc
+/opt/dev-local/miniforge3/bin/conda config --add envs_dirs /workspace/envs
+/opt/dev-local/miniforge3/bin/conda config --add pkgs_dirs /workspace/pkgs
 DEVEOF
 su - dev</code>
     </div>
