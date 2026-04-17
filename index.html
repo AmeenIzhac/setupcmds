@@ -138,6 +138,9 @@ echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 echo '[[ "$PWD" == "$HOME" ]] && cd /workspace' >> ~/.bashrc
 source ~/.bashrc
 conda config --add envs_dirs /workspace/envs
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt install -y nodejs
+sudo npm install -g @getpaseo/cli
 DEVEOF
 su - dev</code>
     </div>
