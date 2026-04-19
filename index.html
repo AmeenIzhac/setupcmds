@@ -115,17 +115,37 @@
         </svg>
         <span class="tooltip">Copied!</span>
       </div>
-      <code>apt update && apt install -y sudo
-useradd -m -s /bin/bash dev
-echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+      <code>apt update && apt install -y sudo curl
+id dev &>/dev/null || useradd -m -s /bin/bash dev
+grep -q "^dev ALL=" /etc/sudoers || echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+mkdir -p /workspace
 chown -R dev:dev /workspace/ 2>/dev/null; chmod -R 777 /workspace
-echo "exec su dev" >> /root/.bashrc
+grep -q "exec su dev" /root/.bashrc || echo "exec su dev" >> /root/.bashrc
+
 su - dev << 'DEVEOF'
+set -e
+
 mkdir -p /workspace/miniforge3 /workspace/.cache/huggingface /workspace/.cache/torch /workspace/hf_home /workspace/envs
-curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
-bash Miniforge3-$(uname)-$(uname -m).sh -b -p /workspace/miniforge3
-/workspace/miniforge3/bin/conda init bash
+
+# Idempotent Miniforge install — skip if already installed
+if [ ! -f /workspace/miniforge3/bin/conda ]; then
+  INSTALLER="Miniforge3-$(uname)-$(uname -m).sh"
+  [ -f "$INSTALLER" ] || curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/${INSTALLER}"
+  # Remove any half-populated dir so -b doesn't refuse
+  rm -rf /workspace/miniforge3
+  bash "$INSTALLER" -b -p /workspace/miniforge3
+fi
+
+# Source conda directly — works regardless of shell interactivity
+source /workspace/miniforge3/etc/profile.d/conda.sh
+conda init bash
+
+# Ensure login shells pick up .bashrc (conda init writes there)
+[ -f ~/.bash_profile ] || echo 'source ~/.bashrc' > ~/.bash_profile
+
+# Claude Code native installer
 curl -fsSL https://claude.ai/install.sh | bash
+
 mkdir -p ~/.claude
 cat > ~/.claude/settings.json << 'EOF'
 {
@@ -136,19 +156,24 @@ cat > ~/.claude/settings.json << 'EOF'
   "fastMode": true
 }
 EOF
-cat >> ~/.bashrc << 'EOF'
+
+# Add env vars to .bashrc if not already present
+grep -q "HF_HOME=/workspace/hf_home" ~/.bashrc || cat >> ~/.bashrc << 'EOF'
 export PATH="$HOME/.local/bin:$PATH"
 export HF_HOME=/workspace/hf_home
 export HUGGINGFACE_HUB_CACHE=/workspace/.cache/huggingface
 export TORCH_HOME=/workspace/.cache/torch
 export XDG_CACHE_HOME=/workspace/.cache
 EOF
-source ~/.bashrc
+
 conda config --add envs_dirs /workspace/envs
+
+# Node.js + paseo
 curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo npm install -g @getpaseo/cli
 DEVEOF
+
 su - dev</code>
     </div>
   </div>
