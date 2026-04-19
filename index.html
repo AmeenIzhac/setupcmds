@@ -116,49 +116,48 @@
         <span class="tooltip">Copied!</span>
       </div>
       <code>apt update && apt install -y sudo curl
-id dev &>/dev/null || useradd -m -s /bin/bash dev
-grep -q "^dev ALL=" /etc/sudoers || echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-mkdir -p /workspace
-chown -R dev:dev /workspace/ 2>/dev/null; chmod -R 777 /workspace
-grep -q "exec su dev" /root/.bashrc || echo "exec su dev" >> /root/.bashrc
+useradd -m -s /bin/bash dev
+echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+mkdir -p /workspace && chown -R dev:dev /workspace && chmod -R 777 /workspace
+echo "exec su dev" >> /root/.bashrc
 
 su - dev << 'DEVEOF'
 set -e
 
-mkdir -p /workspace/miniforge3 /workspace/.cache/huggingface /workspace/.cache/torch /workspace/hf_home /workspace/envs
+# Persistent dirs on /workspace (envs + caches survive restarts)
+mkdir -p /workspace/envs /workspace/pkgs \
+         /workspace/.cache/huggingface /workspace/.cache/torch /workspace/hf_home
 
-# Idempotent Miniforge install — skip if already installed
-if [ ! -f /workspace/miniforge3/bin/conda ]; then
-  INSTALLER="Miniforge3-$(uname)-$(uname -m).sh"
-  [ -f "$INSTALLER" ] || curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/${INSTALLER}"
-  # Remove any half-populated dir so -b doesn't refuse
-  rm -rf /workspace/miniforge3
-  bash "$INSTALLER" -b -p /workspace/miniforge3
+# Install Miniforge to LOCAL disk (fast) — not /workspace
+if [ ! -d "$HOME/miniforge3" ]; then
+  curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
+  bash "Miniforge3-$(uname)-$(uname -m).sh" -b -p "$HOME/miniforge3"
+  rm "Miniforge3-$(uname)-$(uname -m).sh"
 fi
 
-# Source conda directly — works regardless of shell interactivity
-source /workspace/miniforge3/etc/profile.d/conda.sh
+# Make conda available in this shell
+source "$HOME/miniforge3/etc/profile.d/conda.sh"
 conda init bash
 
-# Ensure login shells pick up .bashrc (conda init writes there)
-[ -f ~/.bash_profile ] || echo 'source ~/.bashrc' > ~/.bash_profile
+# Point envs and pkg cache at /workspace so envs persist
+conda config --add envs_dirs /workspace/envs
+conda config --add pkgs_dirs /workspace/pkgs
 
-# Claude Code native installer
+# Claude CLI
 curl -fsSL https://claude.ai/install.sh | bash
-
 mkdir -p ~/.claude
 cat > ~/.claude/settings.json << 'EOF'
 {
-  "permissions": {
-    "defaultMode": "bypassPermissions"
-  },
+  "permissions": { "defaultMode": "bypassPermissions" },
   "skipDangerousModePermissionPrompt": true,
   "fastMode": true
 }
 EOF
 
-# Add env vars to .bashrc if not already present
-grep -q "HF_HOME=/workspace/hf_home" ~/.bashrc || cat >> ~/.bashrc << 'EOF'
+# Persist env vars
+cat >> ~/.bashrc << 'EOF'
+
+# Claude / HF / Torch cache config
 export PATH="$HOME/.local/bin:$PATH"
 export HF_HOME=/workspace/hf_home
 export HUGGINGFACE_HUB_CACHE=/workspace/.cache/huggingface
@@ -166,9 +165,7 @@ export TORCH_HOME=/workspace/.cache/torch
 export XDG_CACHE_HOME=/workspace/.cache
 EOF
 
-conda config --add envs_dirs /workspace/envs
-
-# Node.js + paseo
+# Node + paseo
 curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo npm install -g @getpaseo/cli
