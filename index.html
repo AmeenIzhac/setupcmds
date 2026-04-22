@@ -163,7 +163,9 @@ curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo npm install -g @getpaseo/cli
 DEVEOF
-su - dev</code>
+su - dev
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
+cat ~/.ssh/id_rsa.pub</code>
     </div>
   </div>
 
