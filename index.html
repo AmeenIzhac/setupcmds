@@ -118,25 +118,30 @@
       <code>apt update && apt install -y sudo curl
 useradd -m -s /bin/bash dev
 echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-mkdir -p /workspace && chown -R dev:dev /workspace && chmod -R 777 /workspace
-echo "exec su dev" >> /root/.bashrc
+mkdir -p /workspace && chown -R dev:dev /workspace
+
 su - dev << 'DEVEOF'
 set -e
+
 # Persistent dirs on /workspace (envs + caches survive restarts)
 mkdir -p /workspace/envs /workspace/pkgs \
          /workspace/.cache/huggingface /workspace/.cache/torch /workspace/hf_home
+
 # Install Miniforge to LOCAL disk (fast) — not /workspace
 if [ ! -d "$HOME/miniforge3" ]; then
   curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
   bash "Miniforge3-$(uname)-$(uname -m).sh" -b -p "$HOME/miniforge3"
   rm "Miniforge3-$(uname)-$(uname -m).sh"
 fi
+
 # Make conda available in this shell
 source "$HOME/miniforge3/etc/profile.d/conda.sh"
 conda init bash
+
 # Point envs and pkg cache at /workspace so envs persist
 conda config --add envs_dirs /workspace/envs
 conda config --add pkgs_dirs /workspace/pkgs
+
 # Claude CLI
 curl -fsSL https://claude.ai/install.sh | bash
 mkdir -p ~/.claude
@@ -147,6 +152,7 @@ cat > ~/.claude/settings.json << 'EOF'
   "fastMode": true
 }
 EOF
+
 # Persist env vars
 cat >> ~/.bashrc << 'EOF'
 # Claude / HF / Torch cache config
@@ -158,14 +164,23 @@ export XDG_CACHE_HOME=/workspace/.cache
 # Shorten claude -> c
 alias c='claude'
 EOF
+
 # Node + paseo
 curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo npm install -g @getpaseo/cli
+
+# SSH key
+if [ ! -f ~/.ssh/id_rsa ]; then
+  ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
+fi
+echo "===== PUBLIC KEY BELOW ====="
+cat ~/.ssh/id_rsa.pub
+echo "===== PUBLIC KEY ABOVE ====="
 DEVEOF
-su - dev
-ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
-cat ~/.ssh/id_rsa.pub</code>
+
+# Drop into dev shell after provisioning
+su - dev</code>
     </div>
   </div>
 
