@@ -1,48 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Setup Command</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    body {
+      font-family: 'DM Sans', system-ui, sans-serif;
+      background: #ffffff;
+      color: #1a1a2e;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
 
+    .container {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
 
-  
-  
-  
-  
-  
+    .snippet {
+      background: #f6f7f9;
+      border: 1px solid #e8eaed;
+      border-radius: 12px;
+      padding: 16px 52px 16px 18px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
 
+    .snippet:hover {
+      background: #f0f1f4;
+      border-color: #d0d3da;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
 
-  
+    .snippet:active {
+      background: #eaecf0;
+    }
 
-      
-Copied!
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      line-height: 1.5;
+      color: #2d2d3a;
+      word-break: break-all;
+      display: block;
+      white-space: pre-wrap;
+    }
 
-      
-apt update && apt install -y sudo curl
+    .copy-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      color: #9ca3af;
+      transition: color 0.15s ease, background 0.15s ease;
+      pointer-events: none;
+    }
+
+    .snippet:hover .copy-btn {
+      color: #6b7280;
+    }
+
+    .copy-btn.copied {
+      color: #22c55e;
+    }
+
+    .tooltip {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1a1a2e;
+      color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 5px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease;
+    }
+
+    .tooltip.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="snippet" onclick="copySnippet(this)">
+      <div class="copy-btn">
+        <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        <svg class="icon-check" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:none">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <span class="tooltip">Copied!</span>
+      </div>
+      <code>apt update && apt install -y sudo curl
 useradd -m -s /bin/bash dev
 echo "dev ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
 mkdir -p /workspace && chown -R dev:dev /workspace && chmod -R 777 /workspace
 echo "exec su - dev" >> /root/.bashrc
-
 su - dev << 'DEVEOF'
 set -e
-
-# Persistent dirs on /workspace (envs + caches survive restarts)
-mkdir -p /workspace/envs /workspace/pkgs \
-         /workspace/.cache/huggingface /workspace/.cache/torch /workspace/hf_home
-
-# Install Miniforge to LOCAL disk (fast) — not /workspace
+mkdir -p /workspace/envs /workspace/pkgs /workspace/.cache/huggingface /workspace/.cache/torch /workspace/hf_home
 if [ ! -d "$HOME/miniforge3" ]; then
   curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh"
   bash "Miniforge3-$(uname)-$(uname -m).sh" -b -p "$HOME/miniforge3"
   rm "Miniforge3-$(uname)-$(uname -m).sh"
 fi
-
-# Make conda available in this shell
 source "$HOME/miniforge3/etc/profile.d/conda.sh"
 conda init bash
-
-# Point envs and pkg cache at /workspace so envs persist
 conda config --add envs_dirs /workspace/envs
 conda config --add pkgs_dirs /workspace/pkgs
-
-# Claude CLI
 curl -fsSL https://claude.ai/install.sh | bash
 mkdir -p ~/.claude
 cat > ~/.claude/settings.json << 'EOF'
@@ -52,25 +141,17 @@ cat > ~/.claude/settings.json << 'EOF'
   "fastMode": true
 }
 EOF
-
-# Persist env vars
 cat >> ~/.bashrc << 'EOF'
-# Claude / HF / Torch cache config
 export PATH="$HOME/.local/bin:$PATH"
 export HF_HOME=/workspace/hf_home
 export HUGGINGFACE_HUB_CACHE=/workspace/.cache/huggingface
 export TORCH_HOME=/workspace/.cache/torch
 export XDG_CACHE_HOME=/workspace/.cache
-# Shorten claude -> c
 alias c='claude'
 EOF
-
-# Node + paseo
 curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
 sudo apt install -y nodejs
 sudo npm install -g @getpaseo/cli
-
-# SSH key
 if [ ! -f ~/.ssh/id_rsa ]; then
   ssh-keygen -t rsa -b 4096 -f ~/.ssh/id_rsa -N ""
 fi
@@ -78,12 +159,32 @@ echo "===== PUBLIC KEY BELOW ====="
 cat ~/.ssh/id_rsa.pub
 echo "===== PUBLIC KEY ABOVE ====="
 DEVEOF
+su - dev</code>
+    </div>
+  </div>
 
-# Drop into dev shell after provisioning
-su - dev
+  <script>
+    function copySnippet(el) {
+      const code = el.querySelector("code").innerText;
+      navigator.clipboard.writeText(code);
 
-    
+      const btn = el.querySelector(".copy-btn");
+      const iconCopy = btn.querySelector(".icon-copy");
+      const iconCheck = btn.querySelector(".icon-check");
+      const tooltip = btn.querySelector(".tooltip");
 
+      iconCopy.style.display = "none";
+      iconCheck.style.display = "block";
+      btn.classList.add("copied");
+      tooltip.classList.add("show");
 
-  
-
+      setTimeout(() => {
+        iconCopy.style.display = "block";
+        iconCheck.style.display = "none";
+        btn.classList.remove("copied");
+        tooltip.classList.remove("show");
+      }, 1500);
+    }
+  </script>
+</body>
+</html>
